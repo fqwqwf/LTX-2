@@ -34,11 +34,11 @@
 model:
   # Path to the LTX-2 model checkpoint (.safetensors file)
   # This should be a local path to your downloaded model
-  model_path: "/workspace/train/models/checkpoint/ltx-2-19b-dev-fp8.safetensors"
+  model_path: "/workspace/ComfyUI/models/checkpoints/LTX/ltx-2-19b-dev-fp8.safetensors"
 
   # Path to the text encoder model directory
   # For LTX-2, this is typically the Gemma-based text encoder
-  text_encoder_path: "/workspace/train/models/text_encoder/gemma-3-12b-it-qat-q4_0-unquantized/"
+  text_encoder_path: "/workspace/train/models/text_encoder"
 
   # Training mode: "lora" for efficient adapter training, "full" for full fine-tuning
   # LoRA is recommended for most use cases (faster, less memory, prevents overfitting)
@@ -127,10 +127,10 @@ training_strategy:
 optimization:
   # Learning rate for the optimizer
   # Typical range for LoRA: 1e-5 to 1e-4
-  learning_rate: 1e-4
+  learning_rate: 3e-4
 
   # Total number of training steps
-  steps: 3000
+  steps: 5000
 
   # Batch size per GPU
   # Reduce if running out of memory
@@ -149,14 +149,14 @@ optimization:
 
   # Learning rate scheduler type
   # Options: "constant", "linear", "cosine", "cosine_with_restarts", "polynomial"
-  scheduler_type: "linear"
+  scheduler_type: "cosine"
 
   # Additional scheduler parameters (depends on scheduler_type)
   scheduler_params: { }
 
   # Enable gradient checkpointing to reduce memory usage
   # Recommended for training with limited GPU memory
-  enable_gradient_checkpointing: true
+  enable_gradient_checkpointing: True
 
 # -----------------------------------------------------------------------------
 # Acceleration Configuration
@@ -174,7 +174,7 @@ acceleration:
 
   # Load text encoder in 8-bit precision to save memory
   # Useful when GPU memory is limited
-  load_text_encoder_in_8bit: true
+  load_text_encoder_in_8bit: True
 
 # -----------------------------------------------------------------------------
 # Data Configuration
@@ -183,7 +183,7 @@ acceleration:
 data:
   # Root directory containing preprocessed training data
   # Should contain: latents/, conditions/, and optionally audio_latents/
-  preprocessed_data_root: "/workspace/train/data/preprocessed/"
+  preprocessed_data_root: "/workspace/train/data/unprocessed/asiadoll/.precomputed"
 
   # Number of worker processes for data loading
   # Used for parallel data loading to speed up data loading
@@ -200,11 +200,10 @@ validation:
   # Provide prompts representative of your training data
   # LTX-2 prefers longer, detailed prompts that describe both visual content and audio
   prompts:
-    - "A woman with long blonde hair poses in public street, smiling naturally to the camera as she twirls her hair and bellydances slowly. Soft natural light streams down from above, casting warm shadows across the street. The audio captures the gentle sound of a street and people walking past her, ambient street noise with occasional distant bird chirps."
-    - "A woman with wavy pale blonde hair stands in a professional kitchen, carefully plating a gourmet dish with precise movements. Steam rises from freshly cooked vegetables as he arranges them with tweezers. The stainless steel surfaces gleam under bright overhead lights, and various pots simmer on the stove behind him. The audio features the sizzling of pans, the clinking of utensils against plates, and the ambient hum of kitchen ventilation."
-
+    - "V3SNA2, A beautiful woman with wavy hair is moving seductively in a sunny beach, smiling seductively towards the camera. The beautiful golden sunlight lighting across her wet skin. The audio captures the sounds of dripping water and the girl quietly moaning in pleasure with a breathy voice and the distant sounds of the city."
+  
   # Negative prompt to avoid unwanted artifacts
-  negative_prompt: "worst quality, inconsistent motion, blurry, jittery, distorted"
+  negative_prompt: "worst quality, blurry, jittery, distorted, mutated, deformed, low resolution, watermark, captions"
 
   # Optional: First frame images for image-to-video validation
   # If provided, must have one image per prompt
@@ -213,7 +212,7 @@ validation:
   # Output video dimensions [width, height, frames]
   # Width and height must be divisible by 32
   # Frames must satisfy: frames % 8 == 1 (e.g., 1, 9, 17, 25, 33, 41, 49, 57, 65, 73, 81, 89, ...)
-  video_dims: [ 576, 576, 1 ]
+  video_dims: [ 448, 768, 49 ]
 
   # Frame rate for generated videos
   frame_rate: 25.0
@@ -223,18 +222,18 @@ validation:
 
   # Number of denoising steps for validation inference
   # Higher values = better quality but slower generation
-  inference_steps: 30
+  inference_steps: 20
 
   # Generate validation videos every N training steps
   # Set to null to disable validation during training
-  interval: 100
+  interval: 1000
 
   # Number of videos to generate per prompt
   videos_per_prompt: 1
 
   # Classifier-free guidance scale
   # Higher values = stronger adherence to prompt but may introduce artifacts
-  guidance_scale: 4.0
+  guidance_scale: 3.2
 
   # STG (Spatio-Temporal Guidance) parameters for improved video quality
   # STG is combined with CFG for better temporal coherence
