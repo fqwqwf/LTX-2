@@ -4,11 +4,11 @@ model:
   training_mode: "lora"
   load_checkpoint: null
 
-output_dir: "/workspace/train/outputs/ltx2_av_lora_distilled"
+output_dir: "/workspace/train/LTX-2/packages/ltx-trainer/output/custom"
 seed: 42
 
 data:
-  preprocessed_data_root: "/workspace/train/data/unprocessed/.precomputed"
+  preprocessed_data_root: "/workspace/train/LTX-2/packages/ltx-trainer/data/dataset/.precomputed"
   num_dataloader_workers: 2
 
 training_strategy:
@@ -18,8 +18,8 @@ training_strategy:
   audio_latents_dir: "audio_latents"
 
 lora:
-  rank: 16
-  alpha: 16
+  rank: 32
+  alpha: 32
   dropout: 0.0
   target_modules:
     - "to_k"
@@ -32,7 +32,7 @@ lora:
     # - "audio_ff.net.2"
 
 optimization:
-  learning_rate: 1e-4
+  learning_rate: 2e-4
   steps: 5000
   gradient_accumulation_steps: 1
   max_grad_norm: 1.0
